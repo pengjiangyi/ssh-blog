@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-2.5.xsd 
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+http://www.springframework.org/schema/task
+http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+
+	<context:component-scan base-package="com.service.background"></context:component-scan>
+	<context:component-scan base-package="com.service"></context:component-scan>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="configLocation" value="classpath:hibernate.cfg.xml">
+		</property>
+	</bean>
+	<bean id="UserDAO" class="com.dao.UserDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="ArticDAO" class="com.dao.ArticDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="WordsReplayDAO" class="com.dao.WordsReplayDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="TagsDAO" class="com.dao.TagsDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="RemarkDAO" class="com.dao.RemarkDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="ReplayDAO" class="com.dao.ReplayDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="CategoriesDAO" class="com.dao.CategoriesDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="WordsDAO" class="com.dao.WordsDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="HqlDAO" class="com.dao.HqlDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+
+	<!-- 配置线程池 -->
+	<bean id="threadPool"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 线程池维护线程的最少数量 -->
+		<property name="corePoolSize" value="50"></property>
+		<!-- 线程池维护线程所允许的空闲时间 -->
+		<property name="keepAliveSeconds" value="30000">
+
+		</property>
+
+		<!-- 线程池维护线程的最大数量 -->
+		<property name="maxPoolSize" value="200"></property>
+
+		<property name="queueCapacity" value="1000"></property>
+	</bean>
+	<task:annotation-driven/>
+
+
+
+	
+
+
+
+	<!-- S 事物管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!-- E 事物管理器 -->
+
+	<!-- S 事物属性 -->
+	<tx:advice id="mytx" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- E 事物属性 -->
+
+	<aop:config>
+
+		<aop:advisor advice-ref="mytx" pointcut="execution(* com.service.*.*(..))" />
+		<aop:advisor advice-ref="mytx"
+			pointcut="execution(* com.service.*.*.*(..))" />
+	</aop:config>
+
+
+
+
+
+</beans>
